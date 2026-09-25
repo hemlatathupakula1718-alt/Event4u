@@ -1,0 +1,28 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'admin_dark.css' %}">
+<button onclick="switch_mode()">Switch mode</button>
+{% block extrahead %}
+    <link href="/static/admin/css/dark.css" type="text/css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+{% endblock %}
+<script>
+    function switch_mode() {
+        var body = document.getElementsByTagName("body")[0];
+        var current_mode = body.classList.contains("dark-mode");
+        if (current_mode) {
+            body.classList.remove("dark-mode");
+            localStorage.setItem("mode", "light");
+        } else {
+            body.classList.add("dark-mode");
+            localStorage.setItem("mode", "dark");
+        }
+    }
+    
+    window.onload = function() {
+        var body = document.getElementsByTagName("body")[0];
+        var mode = localStorage.getItem("mode");
+        if (mode == "dark") {
+            body.classList.add("dark-mode");
+        }
+    }
+    </script>
+    

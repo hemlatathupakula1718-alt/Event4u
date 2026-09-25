@@ -1,0 +1,101 @@
+{% load static %}
+<aside class="app-sidebar">
+  <!-- Brand -->
+  <a href="{% url 'home' %}" class="sidebar-brand">
+    <div class="brand-badge">
+      <i class="fa-solid fa-bolt"></i>
+    </div>
+    <div>
+      <h4 class="m-0 fs-5 brand-font text-white" style="letter-spacing: 0.5px;">EVENT<span style="color: #38bdf8;">4U</span></h4>
+      <small style="font-size: 0.65rem; color: #94a3b8; letter-spacing: 0.05em;" class="text-uppercase">College Event Hub</small>
+    </div>
+  </a>
+
+  <!-- Navigation Menu -->
+  <div class="sidebar-menu">
+    <div class="nav-category">Main Operations</div>
+
+    <a href="{% url 'dashboard' %}" class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' or 'dashboard' in request.resolver_match.url_name %}active{% endif %}">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>Dashboard</span>
+    </a>
+
+    <a href="{% url 'events' %}" class="sidebar-link {% if request.resolver_match.url_name == 'events' or request.resolver_match.url_name == 'event_data' %}active{% endif %}">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>Events Directory</span>
+    </a>
+
+    {% if is_principal or is_hod or is_coordinator or user.is_staff %}
+    <div class="nav-category">Management & Approvals</div>
+
+    <a href="{% url 'proposals' %}" class="sidebar-link {% if request.resolver_match.url_name == 'proposals' %}active{% endif %}">
+      <i class="fa-solid fa-file-signature"></i>
+      <span>Event Proposals</span>
+    </a>
+
+    <a href="{% url 'report' %}" class="sidebar-link {% if request.resolver_match.url_name == 'report' or request.resolver_match.url_name == 'generatereport' %}active{% endif %}">
+      <i class="fa-solid fa-file-pdf"></i>
+      <span>Audit & PDF Reports</span>
+    </a>
+    {% endif %}
+
+    {% if is_coordinator or is_subcoordinator or is_principal %}
+    <div class="nav-category">Event Operations & Gate</div>
+
+    <a href="{% url 'scanner' %}" class="sidebar-link {% if request.resolver_match.url_name == 'scanner' %}active{% endif %}">
+      <i class="fa-solid fa-qrcode"></i>
+      <span>QR Gate Scanner</span>
+    </a>
+    {% endif %}
+
+    <div class="nav-category">Student & Activities</div>
+
+    <a href="{% url 'payment' %}" class="sidebar-link {% if request.resolver_match.url_name == 'payment' %}active{% endif %}">
+      <i class="fa-solid fa-credit-card"></i>
+      <span>Fee Payment & Passes</span>
+    </a>
+
+    <a href="{% url 'memories' %}" class="sidebar-link {% if request.resolver_match.url_name == 'memories' %}active{% endif %}">
+      <i class="fa-solid fa-images"></i>
+      <span>Photo Memories</span>
+    </a>
+
+    <a href="{% url 'notification' %}" class="sidebar-link {% if request.resolver_match.url_name == 'notification' %}active{% endif %}">
+      <i class="fa-solid fa-bullhorn"></i>
+      <span>Announcements</span>
+      {% if unread_notifications_count %}
+      <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 0.7rem;">{{ unread_notifications_count }}</span>
+      {% endif %}
+    </a>
+
+    <div class="nav-category">Account</div>
+
+    <a href="{% url 'profile' %}" class="sidebar-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+      <i class="fa-solid fa-user-gear"></i>
+      <span>My Profile</span>
+    </a>
+
+    <a href="{% url 'logout' %}" class="sidebar-link text-danger">
+      <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+      <span>Sign Out</span>
+    </a>
+  </div>
+
+  <!-- User Footer Profile Card -->
+  <div class="sidebar-user d-flex align-items-center gap-3">
+    <div class="position-relative">
+      <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #3b82f6); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white;">
+        {{ user.username|make_list|first|upper }}
+      </div>
+      <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-dark rounded-circle"></span>
+    </div>
+    <div class="overflow-hidden">
+      <div class="text-white fw-bold text-truncate" style="font-size: 0.885rem;">
+        {% if user_profile %}{{ user_profile.display_name }}{% else %}{{ user.username }}{% endif %}
+      </div>
+      <span class="badge bg-primary bg-opacity-25 text-info border border-info border-opacity-25" style="font-size: 0.685rem; padding: 0.2rem 0.5rem;">
+        {{ user_role|title }}
+      </span>
+    </div>
+  </div>
+</aside>

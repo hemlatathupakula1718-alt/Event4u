@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event4u • Smart College Event Management System</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #ec4899 100%);
+      --dark-bg: #090d16;
+      --dark-card: #111827;
+      --border-glow: rgba(99, 102, 241, 0.25);
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6, .brand-font {
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Glass Navbar */
+    .glass-nav {
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      min-height: 88vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: radial-gradient(circle at 50% 20%, rgba(79, 70, 229, 0.25) 0%, rgba(9, 13, 22, 1) 70%);
+      padding: 6rem 0 4rem;
+    }
+
+    .hero-glow-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      border-radius: 50px;
+      color: #a5b4fc;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .hero-title {
+      font-size: 3.85rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #ec4899 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-btn-primary {
+      background: var(--primary-gradient);
+      color: #ffffff;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 0.85rem 2.25rem;
+      border: none;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(99, 102, 241, 0.6);
+      color: #ffffff;
+    }
+
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.85rem 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      transform: translateY(-3px);
+    }
+
+    /* Event Cards */
+    .event-card {
+      background: #131b2e;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .event-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(99, 102, 241, 0.5);
+      box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6), 0 0 25px rgba(99, 102, 241, 0.2);
+    }
+
+    .event-card-img {
+      height: 220px;
+      width: 100%;
+      object-fit: cover;
+      position: relative;
+    }
+
+    .category-pill {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #38bdf8;
+      border-radius: 30px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Stat & Role Cards */
+    .stat-counter-box {
+      background: #131b2e;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-counter-box:hover {
+      background: #1a233b;
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .role-card-desc {
+      color: #cbd5e1 !important;
+      font-size: 0.875rem;
+      line-height: 1.5;
+    }
+    }
+
+    .stat-counter-number {
+      font-size: 2.75rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Category Filter Buttons */
+    .cat-filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #94a3b8;
+      border-radius: 50px;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .cat-filter-btn:hover, .cat-filter-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top glass-nav py-3">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+        <div style="width: 38px; height: 38px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <span class="brand-font fw-bold fs-4 text-white" style="letter-spacing: 0.5px;">EVENT<span style="color: #38bdf8;">4U</span></span>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+        <i class="fa-solid fa-bars text-white"></i>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navContent">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
+          <li class="nav-item"><a class="nav-link text-white fw-medium active" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link text-light opacity-75 hover-white fw-medium" href="#events">Explore Events</a></li>
+          <li class="nav-item"><a class="nav-link text-light opacity-75 hover-white fw-medium" href="#hierarchy">Roles & Approvals</a></li>
+          <li class="nav-item"><a class="nav-link text-light opacity-75 hover-white fw-medium" href="{% url 'memories' %}">Photo Gallery</a></li>
+        </ul>
+
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="fa-solid fa-gauge me-1"></i> My Dashboard
+          </a>
+          <a href="{% url 'logout' %}" class="btn btn-outline-light rounded-pill px-3">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-outline-light rounded-pill px-4 fw-semibold">
+            <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Sign In
+          </a>
+          <a href="{% url 'register' %}" class="hero-btn-primary py-2 px-4">
+            <i class="fa-solid fa-user-plus me-1"></i> Register
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Banner -->
+  <header id="home" class="hero-section text-center text-lg-start">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-7">
+          <div class="hero-glow-badge">
+            <i class="fa-solid fa-sparkles text-warning"></i>
+            <span>Yashwantrao Chavan College Of Arts , Commerce & Science • Event4u Platform</span>
+          </div>
+          <h1 class="hero-title">
+            Transforming College <span>Festivals & Events</span> Online.
+          </h1>
+          <p class="fs-5 text-light opacity-75 mb-4" style="max-width: 580px; line-height: 1.6;">
+            End-to-end college event ecosystem featuring 3-tier proposal approvals, digital holographic QR passes, instant payment checkouts, and live gate scanning.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mb-5">
+            <a href="{% url 'events' %}" class="hero-btn-primary">
+              <i class="fa-solid fa-compass"></i> Discover Live Events
+            </a>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}" class="hero-btn-secondary">
+              <i class="fa-solid fa-key"></i> Staff / Student Login
+            </a>
+            {% else %}
+            <a href="{% url 'dashboard' %}" class="hero-btn-secondary">
+              <i class="fa-solid fa-gauge-high"></i> Go to Control Hub
+            </a>
+            {% endif %}
+          </div>
+
+          <!-- Quick Category Filters -->
+          <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+            <a href="{% url 'events' %}?category=Technical" class="cat-filter-btn"><i class="fa-solid fa-code me-1 text-info"></i> Technical</a>
+            <a href="{% url 'events' %}?category=Cultural" class="cat-filter-btn"><i class="fa-solid fa-music me-1 text-warning"></i> Cultural / On-Stage</a>
+            <a href="{% url 'events' %}?category=Gaming" class="cat-filter-btn"><i class="fa-solid fa-gamepad me-1 text-danger"></i> Gaming & Esports</a>
+            <a href="{% url 'events' %}?category=Sports" class="cat-filter-btn"><i class="fa-solid fa-trophy me-1 text-success"></i> Sports</a>
+          </div>
+        </div>
+
+        <div class="col-lg-5 text-center">
+          <div class="position-relative d-inline-block">
+            <div class="p-4 rounded-4 shadow-lg" style="background: linear-gradient(145deg, #131b2e 0%, #0f172a 100%); border: 1px solid rgba(99, 102, 241, 0.3); max-width: 380px;">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="badge bg-primary px-3 py-1 rounded-pill">VERIFIED PASS</span>
+                <span class="text-info font-monospace small">#CSE-2026-PASS</span>
+              </div>
+              <div class="bg-white p-3 rounded-3 d-inline-block shadow mb-3">
+                <i class="fa-solid fa-qrcode text-dark" style="font-size: 8rem;"></i>
+              </div>
+              <h5 class="fw-bold text-white mb-1">Annual TechFest 2026</h5>
+              <div class="text-muted small mb-3">YCC Main Auditorium • Gate 1 Verified</div>
+              <div class="d-flex justify-content-between text-start small border-top border-secondary border-opacity-25 pt-2">
+                <span class="text-muted">Attendee:</span>
+                <span class="text-white fw-bold">Student Participant</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Stats Section -->
+  <section class="py-5" style="background: #0d121f; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="stat-counter-box">
+            <div class="stat-counter-number">{{ total_events_count|default:"8" }}</div>
+            <h5 class="fw-bold text-white mb-1">Sanctioned Events</h5>
+            <p class="small m-0" style="color: #cbd5e1 !important;">Technical, Cultural & Inter-College Competitions</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-counter-box">
+            <div class="stat-counter-number">{{ total_students_count|default:"45" }}+</div>
+            <h5 class="fw-bold text-white mb-1">Registered Students</h5>
+            <p class="small m-0" style="color: #cbd5e1 !important;">Participants, Volunteers & Audience members</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-counter-box">
+            <div class="stat-counter-number">{{ total_passes_count|default:"30" }}+</div>
+            <h5 class="fw-bold text-white mb-1">Verifiable QR Passes</h5>
+            <p class="small m-0" style="color: #cbd5e1 !important;">Encrypted Gate-Scan Verified Admission</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Events Showcase -->
+  <section id="events" class="py-5">
+    <div class="container py-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-5">
+        <div>
+          <span class="badge bg-primary bg-opacity-20 text-info px-3 py-1 rounded-pill fw-bold text-uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em; border: 1px solid rgba(56, 189, 248, 0.3);">Live Calendar</span>
+          <h2 class="display-6 fw-bold text-white m-0">Explore Featured Events</h2>
+        </div>
+        <a href="{% url 'events' %}" class="btn btn-outline-light rounded-pill px-4 mt-3 mt-md-0 fw-semibold">
+          View Complete Catalog <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        {% for ev in featured_events %}
+        <div class="col-md-6 col-lg-4">
+          <div class="event-card">
+            <div class="position-relative">
+              {% if ev.image %}
+              <img src="{{ ev.image.url }}" class="event-card-img" alt="{{ ev.name }}">
+              {% else %}
+              <div class="event-card-img bg-dark d-flex align-items-center justify-content-center text-primary" style="background: linear-gradient(135deg, #1e1b4b, #312e81);">
+                <i class="fa-solid fa-calendar-star" style="font-size: 4rem;"></i>
+              </div>
+              {% endif %}
+              <div class="position-absolute top-0 start-0 m-3">
+                <span class="category-pill shadow">{{ ev.category }}</span>
+              </div>
+              <div class="position-absolute bottom-0 end-0 m-3">
+                <span class="badge bg-success px-3 py-1 rounded-pill fw-semibold shadow">
+                  <i class="fa-solid fa-circle-check me-1"></i> {{ ev.status }}
+                </span>
+              </div>
+            </div>
+
+            <div class="p-4 d-flex flex-column flex-grow-1">
+              <h5 class="fw-bold text-white mb-2" style="font-size: 1.2rem;">{{ ev.name }}</h5>
+              <p class="small mb-3 flex-grow-1" style="color: #cbd5e1 !important; line-height: 1.55;">{{ ev.description|striptags|truncatewords:18 }}</p>
+
+              <div class="p-3 rounded-3 mb-3" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); color: #f1f5f9; font-size: 0.85rem;">
+                <div class="mb-1 d-flex align-items-center gap-2">
+                  <i class="fa-regular fa-clock text-info"></i>
+                  <span class="text-light fw-medium">{{ ev.eventDate|date:"M d, Y, g:i A"|default:"Date Announced Soon" }}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-location-dot text-danger"></i>
+                  <span class="text-light fw-medium">{{ ev.venue }}</span>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                <div>
+                  <small class="d-block text-uppercase fw-semibold" style="font-size: 0.7rem; color: #94a3b8; letter-spacing: 0.05em;">Faculty Coordinator</small>
+                  <span class="fw-bold text-white small">{{ ev.coordinator.name }}</span>
+                </div>
+                <a href="{% url 'event_data' ev.id %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">
+                  Details <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5 text-light opacity-75">
+          <p>No active events published at the moment.</p>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Role Hierarchy & Workflow Architecture -->
+  <section id="hierarchy" class="py-5" style="background: #0d121f; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="container py-4">
+      <div class="text-center mb-5">
+        <span class="badge bg-primary bg-opacity-20 text-info px-3 py-1 rounded-pill fw-bold text-uppercase mb-2" style="font-size: 0.85rem; letter-spacing: 0.08em; border: 1px solid rgba(56, 189, 248, 0.3);">Role-Based Governance</span>
+        <h2 class="display-6 fw-bold text-white mb-2">How Event4u Connects Campus Stakeholders</h2>
+        <p class="text-light opacity-90 mx-auto" style="max-width: 650px; font-size: 1rem; color: #e2e8f0 !important;">Structured permissions and 3-tier approval hierarchy ensuring institutional safety and financial accountability.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- 1. Principal -->
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-counter-box text-start p-4 h-100">
+            <div class="d-inline-flex p-3 rounded-4 mb-3" style="background: rgba(234, 179, 8, 0.15); border: 1px solid rgba(234, 179, 8, 0.3);">
+              <i class="fa-solid fa-crown text-warning fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2">1. Principal & Director</h5>
+            <p class="role-card-desc mb-0">High-level institutional oversight, final proposal budget sanctioning, audit reports, and college-wide analytics.</p>
+          </div>
+        </div>
+
+        <!-- 2. HoD -->
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-counter-box text-start p-4 h-100">
+            <div class="d-inline-flex p-3 rounded-4 mb-3" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.3);">
+              <i class="fa-solid fa-building-columns text-success fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2">2. Head of Dept (HoD)</h5>
+            <p class="role-card-desc mb-0">Review departmental proposals, verify feasibility & safety, endorse submissions before forwarding to Principal.</p>
+          </div>
+        </div>
+
+        <!-- 3. Coordinator -->
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-counter-box text-start p-4 h-100">
+            <div class="d-inline-flex p-3 rounded-4 mb-3" style="background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3);">
+              <i class="fa-solid fa-chalkboard-user text-primary fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2">3. Faculty Coordinator</h5>
+            <p class="role-card-desc mb-0">Draft proposals, appoint student sub-coordinators, allocate sub-event budgets, and verify student payments.</p>
+          </div>
+        </div>
+
+        <!-- 4. Sub-Coordinator -->
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-counter-box text-start p-4 h-100">
+            <div class="d-inline-flex p-3 rounded-4 mb-3" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3);">
+              <i class="fa-solid fa-shield-halved text-info fs-4"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2">4. Sub-Coordinator</h5>
+            <p class="role-card-desc mb-0">Manage volunteers, execute sub-events, verify entry passes at gates using the live QR scanner tool.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-5 text-center" style="background: #090d16; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div class="container">
+      <div class="mb-3">
+        <a class="navbar-brand d-inline-flex align-items-center gap-2 text-decoration-none" href="#home">
+          <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.25rem;">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <span class="brand-font fw-bold fs-2 text-white" style="letter-spacing: 1px;">EVENT<span style="color: #38bdf8;">4U</span></span>
+        </a>
+      </div>
+
+      <p class="mb-3 mx-auto text-light fw-medium" style="max-width: 600px; font-size: 0.95rem; line-height: 1.6; color: #cbd5e1 !important;">
+        Smart Event Manager Web Application designed for <span class="text-white fw-bold">Yashwantrao Chavan College Of Arts , Commerce & Science</span>.
+      </p>
+
+      <div class="mb-4">
+        <span class="badge bg-primary bg-opacity-20 text-info px-3 py-2 rounded-pill fw-semibold border border-info border-opacity-25" style="font-size: 0.85rem;">
+          <i class="fa-solid fa-code me-1"></i> Developed by <strong class="text-white ms-1">Hemlata</strong>
+        </span>
+      </div>
+
+      <div class="small fw-semibold" style="color: #94a3b8;">
+        © {% now "Y" %} Event4u. All Rights Reserved. • Yashwantrao Chavan College Campus
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

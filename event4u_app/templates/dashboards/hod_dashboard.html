@@ -1,0 +1,192 @@
+{% extends 'base/base.html' %}
+{% block title %}HoD Department Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Welcome Banner -->
+  <div class="card-modern p-4 mb-4 border-0 text-white" style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #059669 100%);">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-light text-success fw-bold px-3 py-1 rounded-pill mb-2">
+          <i class="fa-solid fa-building-columns me-1"></i> Departmental Leadership
+        </span>
+        <h2 class="display-6 fw-bold mb-1 text-white">Head of Department (HoD) Portal</h2>
+        <p class="text-light opacity-75 mb-3" style="max-width: 600px;">
+          Managing {{ user_branch }} Department event proposals, reviewing student participation metrics, and forwarding sanctioned event proposals to the Principal.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'proposals' %}" class="btn btn-light fw-bold text-success rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-list-check me-1"></i> Review Dept Proposals ({{ pending_proposals.count }})
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-inline-block text-start">
+          <div class="small text-light opacity-75">Department Branch</div>
+          <div class="fs-2 fw-bold text-white">{{ user_branch }} Engineering</div>
+          <div class="small text-warning"><i class="fa-solid fa-circle-check me-1"></i> Active Event Coordination</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+        </div>
+        <div>
+          <div class="stat-label">Pending HoD Endorsements</div>
+          <div class="stat-number text-warning">{{ pending_proposals.count }}</div>
+          <small class="text-muted fw-semibold">Proposals awaiting your sign-off</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Approved & Forwarded</div>
+          <div class="stat-number text-success">{{ approved_proposals.count }}</div>
+          <small class="text-muted fw-semibold">Sent to Principal desk</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+          <i class="fa-solid fa-users"></i>
+        </div>
+        <div>
+          <div class="stat-label">Dept Students Engaged</div>
+          <div class="stat-number text-primary">{{ dept_participants|add:dept_volunteers }}</div>
+          <small class="text-muted fw-semibold">Participants & Volunteers</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Proposals Table -->
+  <div class="card-modern mb-4">
+    <div class="card-modern-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-warning bg-opacity-10 text-warning p-2 rounded-3">
+          <i class="fa-solid fa-file-signature fs-5"></i>
+        </span>
+        <div>
+          <h5 class="m-0 fw-bold">Department Event Proposals Requiring HoD Endorsement</h5>
+          <small class="text-muted">Proposals submitted by your faculty coordinators for review</small>
+        </div>
+      </div>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Proposal Title</th>
+              <th>Faculty Coordinator</th>
+              <th>College Fund Requested</th>
+              <th>Fee / Student</th>
+              <th>Status</th>
+              <th class="text-end pe-4">HoD Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prop in pending_proposals %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-bold text-dark">{{ prop.title }}</div>
+                <small class="text-muted text-truncate d-inline-block" style="max-width: 250px;">{{ prop.description|striptags }}</small>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ prop.coordinator.name }}</div>
+                <small class="text-muted">ERP: {{ prop.coordinator.erp }}</small>
+              </td>
+              <td class="fw-bold">₹{{ prop.fundRecieveFromCollege }}</td>
+              <td>₹{{ prop.feeApplicableForPerStudent }}</td>
+              <td>
+                <span class="badge bg-warning bg-opacity-10 text-warning px-2 py-1 rounded-pill">
+                  HoD Review Pending
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <div class="d-flex justify-content-end gap-1">
+                  <a href="{% url 'approve-proposal-hod' prop.id %}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-check me-1"></i> Endorse Proposal
+                  </a>
+                  <a href="{% url 'reject-proposal' prop.id %}" class="btn btn-outline-danger btn-sm rounded-pill">
+                    <i class="fa-solid fa-xmark"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i class="fa-solid fa-circle-check text-success fs-2 mb-2 d-block"></i>
+                No pending proposals waiting for HoD endorsement.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department Events List -->
+  <div class="card-modern">
+    <div class="card-modern-header">
+      <h5 class="m-0 fw-bold">{{ user_branch }} Department Events</h5>
+      <a href="{% url 'events' %}" class="btn btn-outline-primary btn-sm rounded-pill">Explore All Events</a>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Event Name</th>
+              <th>Coordinator</th>
+              <th>Date & Venue</th>
+              <th>Allocated Budget</th>
+              <th>Sub-Events</th>
+              <th>Status</th>
+              <th class="text-end pe-4">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ev in department_events %}
+            <tr>
+              <td class="ps-4 fw-bold text-dark">{{ ev.name }}</td>
+              <td>{{ ev.coordinator.name }}</td>
+              <td>{{ ev.eventDate|date:"M d, Y"|default:"TBD" }} • {{ ev.venue }}</td>
+              <td class="fw-bold">₹{{ ev.totalMoney }}</td>
+              <td>{{ ev.subevents.count }}</td>
+              <td><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2 py-1">{{ ev.status }}</span></td>
+              <td class="text-end pe-4">
+                <a href="{% url 'generatereport' ev.id %}" class="btn btn-outline-danger btn-sm rounded-pill">
+                  <i class="fa-solid fa-file-pdf me-1"></i> Audit PDF
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No department events recorded yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

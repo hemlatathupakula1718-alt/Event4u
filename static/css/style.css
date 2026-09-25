@@ -1,0 +1,14 @@
+.bg-primary {
+    background: #ff1744 !important;
+    background: linear-gradient(to right, #fc00ff, #00dbde) !important;
+    background: linear-gradient(19deg, #21D4FD 0%, #B721FF 100%)!important;
+}
+
+.mt20 {
+    margin-top: 20px;
+}
+
+.container-custom {
+    width: 95% !important;
+    margin: auto;
+}

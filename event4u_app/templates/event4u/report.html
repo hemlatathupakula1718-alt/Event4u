@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+{% block title %}Event Audit & PDF Reports{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h3 class="m-0 fw-bold brand-font text-dark">Institutional Event Audit & Reports Center</h3>
+      <small class="text-muted">Download formal, publication-ready PDF event completion and financial audit reports</small>
+    </div>
+  </div>
+
+  <div class="card-modern">
+    <div class="card-modern-header">
+      <div>
+        <h5 class="m-0 fw-bold">Active & Completed Events Audit Roster</h5>
+        <small class="text-muted">Click to generate dynamically compiled ReportLab PDF audit documents</small>
+      </div>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Event Details</th>
+              <th>Category</th>
+              <th>Faculty Coordinator</th>
+              <th>Audience / Attendees</th>
+              <th>Allocated Budget</th>
+              <th>Current Status</th>
+              <th class="text-end pe-4">Official PDF Report</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for event in events %}
+            <tr>
+              <td class="ps-4">
+                <div class="fw-bold text-dark">{{ event.name }}</div>
+                <small class="text-muted">{{ event.venue }} • {{ event.eventDate|date:"M d, Y"|default:"TBD" }}</small>
+              </td>
+              <td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">{{ event.category }}</span></td>
+              <td>
+                <div class="fw-semibold text-dark">{{ event.coordinator.name }}</div>
+                <small class="text-muted">{{ event.coordinator.branch }} Dept</small>
+              </td>
+              <td class="fw-bold text-primary">{{ event.total_attendees_count }} Attendees</td>
+              <td class="fw-bold text-dark">₹{{ event.totalMoney|default:0 }}</td>
+              <td>
+                <span class="badge {% if event.status == 'Active' %}bg-success{% else %}bg-secondary{% endif %} bg-opacity-10 text-{% if event.status == 'Active' %}success{% else %}secondary{% endif %} border rounded-pill px-2 py-1">
+                  {{ event.status }}
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <a href="{% url 'generatereport' event.id %}" class="btn btn-gradient-secondary btn-sm rounded-pill px-4 shadow-sm" download>
+                  <i class="fa-solid fa-file-arrow-down me-1"></i> Download PDF Report
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">No events available for report compilation.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

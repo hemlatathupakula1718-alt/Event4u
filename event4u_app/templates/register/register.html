@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Registration • Event4u</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #090d16;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      padding: 2.5rem 1rem;
+      background: radial-gradient(circle at 50% 20%, rgba(79, 70, 229, 0.25) 0%, rgba(9, 13, 22, 1) 80%);
+    }
+
+    .reg-card {
+      background: #131b2e;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 35px rgba(99, 102, 241, 0.15);
+      max-width: 750px;
+      width: 100%;
+      padding: 2.5rem;
+    }
+
+    .form-control, .form-select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #ffffff;
+      padding: 0.75rem 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #6366f1;
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+    }
+
+    .form-select option {
+      background-color: #1e1b4b;
+      color: #ffffff;
+    }
+
+    .form-control::placeholder {
+      color: #64748b;
+    }
+
+    .btn-register {
+      background: linear-gradient(135deg, #4f46e5 0%, #ec4899 100%);
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-size: 1rem;
+      box-shadow: 0 10px 25px rgba(236, 72, 153, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-register:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 30px rgba(236, 72, 153, 0.5);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reg-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <div style="width: 32px; height: 32px; border-radius: 8px; background: linear-gradient(135deg, #6366f1, #ec4899); display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+            <i class="fa-solid fa-bolt text-white"></i>
+          </div>
+          <span class="fw-bold font-monospace text-white">EVENT<span style="color: #38bdf8;">4U</span></span>
+        </div>
+        <h3 class="fw-bold text-white m-0" style="font-family: 'Outfit';">Student Registration Portal</h3>
+      </div>
+      <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Already Registered? Sign In
+      </a>
+    </div>
+
+    {% if form.errors %}
+    <div class="alert alert-danger py-2 small mb-3">
+      <strong>Please fix the errors below:</strong>
+      <ul class="mb-0 ps-3">
+        {% for field in form %}
+          {% for error in field.errors %}
+          <li>{{ field.label }}: {{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        {% for error in form.non_field_errors %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'register' %}">
+      {% csrf_token %}
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Full Name</label>
+          {{ form.fullName }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Username</label>
+          {{ form.username }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">College Email</label>
+          {{ form.email }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">WhatsApp / Mobile Contact</label>
+          {{ form.phone }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Department / Branch</label>
+          {{ form.branch }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Semester</label>
+          {{ form.semester }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Roll Number</label>
+          {{ form.rollNumber }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">College ERP Number</label>
+          {{ form.erp }}
+        </div>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Password</label>
+          {{ form.password }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label small fw-semibold text-light">Confirm Password</label>
+          {{ form.confirm_password }}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-register w-100 mb-3">
+        <i class="fa-solid fa-user-check me-2"></i> Complete Registration & Activate Passes
+      </button>
+
+      <div class="text-center text-muted small">
+        By registering, you agree to Yashwantrao Chavan College Of Arts , Commerce & Science event protocols and campus rules.
+      </div>
+    </form>
+  </div>
+
+</body>
+</html>

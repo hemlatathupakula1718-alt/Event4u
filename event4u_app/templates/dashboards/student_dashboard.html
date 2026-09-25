@@ -1,0 +1,220 @@
+{% extends 'base/base.html' %}
+{% block title %}Student Experience & Passes Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Welcome Banner -->
+  <div class="card-modern p-4 mb-4 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #ec4899 100%);">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-2">
+          <i class="fa-solid fa-graduation-cap me-1"></i> Student Experience Portal
+        </span>
+        <h2 class="display-6 fw-bold mb-1 text-white">Welcome, {{ user_profile.display_name|default:user.username }}!</h2>
+        <p class="text-light opacity-75 mb-3" style="max-width: 600px;">
+          Access your digital holographic gate passes, register for technical & cultural competitions, track fee payments, and explore campus memories.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'events' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-compass me-1"></i> Explore & Register for Events
+          </a>
+          <a href="{% url 'payment' %}" class="btn btn-outline-light rounded-pill px-4">
+            <i class="fa-solid fa-receipt me-1"></i> Submit Payment Proof
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-inline-block text-start">
+          <div class="small text-light opacity-75">{{ user_profile.branch|default:"Computer" }} Department</div>
+          <div class="fs-4 fw-bold text-white">Roll: {{ user_profile.rollNumber|default:"N/A" }} • Sem {{ user_profile.semester|default:"6" }}</div>
+          <div class="small text-info"><i class="fa-solid fa-id-badge me-1"></i> College ERP: {{ user_profile.erp|default:"N/A" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Passes Showcase Cards -->
+  <div class="mb-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h4 class="m-0 fw-bold brand-font text-dark"><i class="fa-solid fa-ticket text-primary me-2"></i>My Digital Hologram Entry Passes</h4>
+        <small class="text-muted">Show this official barcode / QR code at college entrance for verified admission</small>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      {% for p in user_passes %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card-modern border-0 overflow-hidden shadow-sm h-100 position-relative" style="background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%); color: #ffffff;">
+          <div class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+            <span class="badge bg-primary text-white px-2 py-1 rounded-pill">
+              <i class="fa-solid fa-bolt me-1"></i> {{ p.registrationType }}
+            </span>
+            <small class="text-secondary font-monospace">#{{ p.uuid|stringformat:".8s" }}</small>
+          </div>
+          <div class="card-modern-body text-center p-4">
+            <h5 class="fw-bold text-white mb-1">{{ p.event.name }}</h5>
+            <p class="text-info small mb-3">
+              {% if p.subevent %}{{ p.subevent.name }} • {% endif %}{{ p.event.venue }}
+            </p>
+
+            <!-- Verifiable QR Code Preview -->
+            <div class="bg-white p-3 rounded-4 d-inline-block shadow-sm mb-3">
+              <img src="{% url 'generate-qr' %}?event_id={{ p.event.id }}" width="130" height="130" alt="Pass QR Code" class="img-fluid">
+            </div>
+
+            <div class="text-start bg-secondary bg-opacity-10 p-3 rounded-3 mb-3 border border-secondary border-opacity-25" style="font-size: 0.825rem;">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Attendee:</span>
+                <span class="text-white fw-bold">{{ p.name }}</span>
+              </div>
+              <div class="d-flex justify-content-between mb-1">
+                <span class="text-muted">Event Date:</span>
+                <span class="text-white">{{ p.date }}</span>
+              </div>
+              <div class="d-flex justify-content-between">
+                <span class="text-muted">Gate Status:</span>
+                {% if p.isCheckedIn %}
+                <span class="text-success fw-bold"><i class="fa-solid fa-circle-check me-1"></i> Checked-in</span>
+                {% else %}
+                <span class="text-warning fw-bold"><i class="fa-solid fa-clock me-1"></i> Active / Ready</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <a href="{% url 'generate-pass' p.event.id %}" class="btn btn-gradient btn-sm rounded-pill py-2">
+                <i class="fa-solid fa-expand me-1"></i> View Full Pass Badge
+              </a>
+              <a href="{% url 'generate-qr' %}?event_id={{ p.event.id }}" download class="btn btn-outline-light btn-sm rounded-pill">
+                <i class="fa-solid fa-download me-1"></i> Download Pass QR PNG
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="col-12">
+        <div class="card-modern p-5 text-center text-muted">
+          <i class="fa-solid fa-ticket-simple text-primary opacity-50 fs-1 mb-3"></i>
+          <h5>No Active Passes Found</h5>
+          <p class="text-muted mb-3">You haven't registered for any active events yet. Browse available events below and claim your digital entry badge!</p>
+          <div>
+            <a href="{% url 'events' %}" class="btn btn-gradient rounded-pill px-4">Browse College Events</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Available Events to Register -->
+  <div class="card-modern mb-4">
+    <div class="card-modern-header">
+      <div>
+        <h5 class="m-0 fw-bold">Live & Upcoming College Events</h5>
+        <small class="text-muted">Register as a Participant, Volunteer, or Audience member</small>
+      </div>
+      <a href="{% url 'events' %}" class="btn btn-outline-primary btn-sm rounded-pill">View All Events</a>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Event Name</th>
+              <th>Category</th>
+              <th>Faculty Coordinator</th>
+              <th>Venue & Date</th>
+              <th>Sub-Events</th>
+              <th class="text-end pe-4">Quick Registration</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ev in available_events %}
+            <tr>
+              <td class="ps-4">
+                <a href="{% url 'event_data' ev.id %}" class="fw-bold text-dark text-decoration-none hover-primary">{{ ev.name }}</a>
+                <div class="text-muted small text-truncate" style="max-width: 220px;">{{ ev.description|striptags }}</div>
+              </td>
+              <td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">{{ ev.category }}</span></td>
+              <td>{{ ev.coordinator.name }}</td>
+              <td>{{ ev.eventDate|date:"M d, Y"|default:"TBD" }} • {{ ev.venue }}</td>
+              <td><span class="badge bg-secondary rounded-pill">{{ ev.subevents.count }}</span></td>
+              <td class="text-end pe-4">
+                <div class="d-flex justify-content-end gap-1">
+                  <a href="{% url 'participant' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                    Participant
+                  </a>
+                  <a href="{% url 'volunteer' %}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                    Volunteer
+                  </a>
+                  <a href="{% url 'audience' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    Audience
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No open events right now.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Payment Submissions History -->
+  <div class="card-modern">
+    <div class="card-modern-header">
+      <h5 class="m-0 fw-bold">My Payment Submissions & Status</h5>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem;">
+            <tr>
+              <th class="ps-4">Event</th>
+              <th>Amount</th>
+              <th>Mode</th>
+              <th>Transaction ID / Receipt</th>
+              <th>Date</th>
+              <th>Verification Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for pay in user_payments %}
+            <tr>
+              <td class="ps-4 fw-bold text-dark">{{ pay.event.name }}</td>
+              <td class="fw-bold">₹{{ pay.amount }}</td>
+              <td><span class="badge bg-secondary rounded-pill">{{ pay.modeOfPayment }}</span></td>
+              <td><small class="text-muted">{{ pay.transactionId|default:pay.recieptNumber|default:"Direct Verification" }}</small></td>
+              <td>{{ pay.createdAt|date:"M d, Y" }}</td>
+              <td>
+                {% if pay.coordinatorCheck %}
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1">
+                  <i class="fa-solid fa-check me-1"></i> Verified & Active
+                </span>
+                {% else %}
+                <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 rounded-pill px-2 py-1">
+                  <i class="fa-solid fa-clock me-1"></i> Verification Pending
+                </span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No payment records yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

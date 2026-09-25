@@ -1,0 +1,287 @@
+{% extends 'base/base.html' %}
+{% block title %}Sub-Coordinator Operations & Gate Hub{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Welcome Banner -->
+  <div class="card-modern p-4 mb-4 border-0 text-white" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <span class="badge bg-primary text-white fw-bold px-3 py-1 rounded-pill mb-2">
+          <i class="fa-solid fa-shield-halved me-1"></i> Student Event Operations Team
+        </span>
+        <h2 class="display-6 fw-bold mb-1 text-white">Sub-Coordinator Control Desk</h2>
+        <p class="text-light opacity-75 mb-3" style="max-width: 600px;">
+          Welcome, <strong>{{ subcoord.name|default:user.username }}</strong>! Supervise your assigned sub-events, manage volunteer task allocations, verify student passes at entry gates, and upload event memories.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'scanner' %}" class="btn btn-gradient fw-bold rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-qrcode me-1"></i> Launch Full-Screen QR Scanner
+          </a>
+          <a href="{% url 'memories' %}" class="btn btn-outline-light rounded-pill px-4">
+            <i class="fa-solid fa-camera me-1"></i> Upload Event Photos
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <div class="bg-white bg-opacity-10 p-3 rounded-4 border border-white border-opacity-10 d-inline-block text-start">
+          <div class="small text-light opacity-75">Designated Lead</div>
+          <div class="fs-4 fw-bold text-white">{{ subcoord.name|default:user.username }}</div>
+          <div class="small text-info"><i class="fa-solid fa-id-badge me-1"></i> ERP: {{ subcoord.erp|default:user.username }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+          <i class="fa-solid fa-layer-group"></i>
+        </div>
+        <div>
+          <div class="stat-label">Assigned Sub-Events</div>
+          <div class="stat-number text-dark">{{ subevents.count }}</div>
+          <small class="text-muted">Under your supervision</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+          <i class="fa-solid fa-handshake-angle"></i>
+        </div>
+        <div>
+          <div class="stat-label">Volunteers Coordinated</div>
+          <div class="stat-number text-info">{{ volunteers.count }}</div>
+          <small class="text-muted">Taskforce allocated</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-4">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Registered Participants</div>
+          <div class="stat-number text-success">{{ participants.count }}</div>
+          <small class="text-muted">Competing students</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Pass Verification & Gate Check-in Box -->
+  <div class="card-modern mb-4 border-primary">
+    <div class="card-modern-header bg-primary bg-opacity-10">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-primary text-white p-2 rounded-3">
+          <i class="fa-solid fa-qrcode fs-5"></i>
+        </span>
+        <div>
+          <h5 class="m-0 fw-bold text-dark">Instant Gate Pass Check-in & Search</h5>
+          <small class="text-muted">Verify student pass QR code string or enter Pass UUID / Username</small>
+        </div>
+      </div>
+      <a href="{% url 'scanner' %}" class="btn btn-primary btn-sm rounded-pill px-3">
+        <i class="fa-solid fa-camera me-1"></i> Open Camera Scanner
+      </a>
+    </div>
+    <div class="card-modern-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-8">
+          <div class="input-group input-group-lg">
+            <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-ticket text-muted"></i></span>
+            <input type="text" id="quickPassInput" class="form-control border-start-0" placeholder="Paste QR Payload or Pass UUID (e.g. f1f02273-2384-4f76...)">
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button type="button" onclick="performQuickCheckin()" class="btn btn-gradient w-100 py-3 rounded-3 fw-bold">
+            <i class="fa-solid fa-circle-check me-1"></i> Verify & Grant Entry
+          </button>
+        </div>
+      </div>
+      
+      <!-- Live Result Display -->
+      <div id="checkinResult" class="mt-3" style="display: none;"></div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Assigned Sub-Events Cards -->
+    <div class="col-xl-6">
+      <div class="card-modern h-100">
+        <div class="card-modern-header">
+          <h5 class="m-0 fw-bold">My Assigned Sub-Events</h5>
+        </div>
+        <div class="card-modern-body p-0">
+          <div class="list-group list-group-flush">
+            {% for s in subevents %}
+            <div class="list-group-item p-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h6 class="fw-bold text-dark m-0">{{ s.name }}</h6>
+                  <small class="text-muted">{{ s.event.name }} • {{ s.venue }}</small>
+                </div>
+                <span class="badge bg-primary rounded-pill">₹{{ s.totalBudget }} Budget</span>
+              </div>
+              <p class="text-muted small m-0">{{ s.description|striptags }}</p>
+              <div class="mt-2 d-flex gap-3 text-muted small">
+                <span><i class="fa-solid fa-users me-1 text-primary"></i> {{ s.participants.count }} Participants</span>
+                <span><i class="fa-solid fa-hands-holding me-1 text-info"></i> {{ s.volunteers.count }} Volunteers</span>
+                <span><i class="fa-regular fa-clock me-1 text-secondary"></i> {{ s.eventDate|date:"M d, Y"|default:"TBD" }}</span>
+              </div>
+            </div>
+            {% empty %}
+            <div class="p-4 text-center text-muted">No sub-events assigned to your profile yet.</div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volunteers List -->
+    <div class="col-xl-6">
+      <div class="card-modern h-100">
+        <div class="card-modern-header">
+          <h5 class="m-0 fw-bold">Volunteer Squad Roster</h5>
+        </div>
+        <div class="card-modern-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light text-muted" style="font-size: 0.8rem;">
+                <tr>
+                  <th class="ps-3">Volunteer</th>
+                  <th>Sub-Event</th>
+                  <th>Assigned Duties</th>
+                  <th>ERP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for vol in volunteers %}
+                <tr>
+                  <td class="ps-3">
+                    <div class="fw-bold text-dark">{{ vol.name }}</div>
+                    <small class="text-muted">{{ vol.branch }} (Sem {{ vol.semester }})</small>
+                  </td>
+                  <td><span class="badge bg-light text-dark border">{{ vol.subevent.name }}</span></td>
+                  <td><small class="text-muted text-truncate d-inline-block" style="max-width: 160px;">{{ vol.work }}</small></td>
+                  <td class="fw-bold text-muted">{{ vol.erp }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center py-4 text-muted">No volunteers registered yet.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Participants Table -->
+  <div class="card-modern">
+    <div class="card-modern-header">
+      <h5 class="m-0 fw-bold">Registered Participants for Sub-Events</h5>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Student Name</th>
+              <th>Sub-Event</th>
+              <th>Branch / Sem</th>
+              <th>Roll Number</th>
+              <th>College ERP</th>
+              <th>Registered Interests</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in participants %}
+            <tr>
+              <td class="ps-4 fw-bold text-dark">{{ p.name }}</td>
+              <td><span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25">{{ p.subevent.name }}</span></td>
+              <td>{{ p.branch }} (Sem {{ p.semester }})</td>
+              <td>{{ p.rollNumber }}</td>
+              <td class="fw-bold">{{ p.erp }}</td>
+              <td><small class="text-muted">{{ p.interest|striptags }}</small></td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">No participants registered yet.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extrascript %}
+<script>
+  function performQuickCheckin() {
+    const inputVal = document.getElementById('quickPassInput').value.trim();
+    const resultDiv = document.getElementById('checkinResult');
+    if (!inputVal) {
+      alert("Please paste a QR payload or enter Pass UUID.");
+      return;
+    }
+
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = '<div class="alert alert-info py-2"><i class="fa-solid fa-spinner fa-spin me-2"></i> Verifying with gate database...</div>';
+
+    const formData = new FormData();
+    formData.append('qr_data', inputVal);
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch("{% url 'verify-pass-api' %}", {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        resultDiv.innerHTML = `
+          <div class="alert alert-success border-2 shadow-sm">
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-check me-1"></i> ${data.message}</h6>
+            <div><strong>Attendee:</strong> ${data.attendee_name} (ERP: ${data.erp_number})</div>
+            <div><strong>Event:</strong> ${data.event_name} (${data.registration_type})</div>
+            <small class="text-muted">Check-in Logged: ${data.checked_in_at}</small>
+          </div>
+        `;
+        document.getElementById('quickPassInput').value = '';
+      } else if (data.status === 'duplicate') {
+        resultDiv.innerHTML = `
+          <div class="alert alert-warning border-2 shadow-sm">
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> ${data.message}</h6>
+            <div><strong>Attendee:</strong> ${data.attendee_name} (ERP: ${data.erp_number})</div>
+            <div><strong>Event:</strong> ${data.event_name} (${data.registration_type})</div>
+            <small class="text-muted">Original Check-in: ${data.checked_in_at}</small>
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = `
+          <div class="alert alert-danger border-2 shadow-sm">
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-circle-xmark me-1"></i> Verification Failed</h6>
+            <div>${data.message}</div>
+          </div>
+        `;
+      }
+    })
+    .catch(err => {
+      resultDiv.innerHTML = `<div class="alert alert-danger py-2">Error connecting to server.</div>`;
+    });
+  }
+</script>
+{% endblock %}

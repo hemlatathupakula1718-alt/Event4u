@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} • Event4u Smart Event Hub</title>
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #818cf8;
+      --secondary: #0ea5e9;
+      --accent: #ec4899;
+      --dark-bg: #0f172a;
+      --card-bg: #ffffff;
+      --sidebar-bg: #1e1b4b;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --glow-shadow: 0 10px 25px -5px rgba(79, 70, 229, 0.2), 0 8px 10px -6px rgba(79, 70, 229, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: #f8fafc;
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, h6, .brand-font {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* Layout */
+    .app-wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Modern Sidebar */
+    .app-sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, #111827 0%, #1e1b4b 100%);
+      color: #ffffff;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1040;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar-brand {
+      padding: 1.5rem 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      text-decoration: none;
+      color: #ffffff;
+    }
+
+    .sidebar-brand .brand-badge {
+      background: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .sidebar-menu {
+      padding: 1.25rem 1rem;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .nav-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+      padding: 0.75rem 0.75rem 0.35rem;
+      font-weight: 700;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.75rem 1rem;
+      color: #cbd5e1;
+      text-decoration: none;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.925rem;
+      transition: all 0.2s ease;
+      margin-bottom: 0.25rem;
+    }
+
+    .sidebar-link i {
+      width: 22px;
+      font-size: 1.1rem;
+      color: #818cf8;
+      transition: all 0.2s ease;
+    }
+
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    .sidebar-link:hover i {
+      color: #38bdf8;
+    }
+
+    .sidebar-link.active {
+      background: linear-gradient(90deg, #4f46e5 0%, #6366f1 100%);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+    }
+
+    .sidebar-link.active i {
+      color: #ffffff;
+    }
+
+    .sidebar-user {
+      padding: 1.25rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.2);
+    }
+
+    /* Main Area */
+    .app-main {
+      margin-left: 280px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      transition: all 0.3s ease;
+    }
+
+    /* Top Navbar */
+    .app-topbar {
+      background: #ffffff;
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 1020;
+    }
+
+    /* Content Body */
+    .app-content {
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    /* Modern Cards */
+    .card-modern {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      overflow: hidden;
+    }
+
+    .card-modern:hover {
+      box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-modern-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+    }
+
+    .card-modern-body {
+      padding: 1.5rem;
+    }
+
+    /* KPI Stat Cards */
+    .stat-card {
+      border-radius: 16px;
+      padding: 1.5rem;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    }
+
+    .stat-card .stat-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .stat-card .stat-number {
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1.2;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .stat-card .stat-label {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+    }
+
+    /* Custom Badges */
+    .badge-pill-custom {
+      padding: 0.45em 0.85em;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.65rem 1.35rem;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-gradient:hover {
+      background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+    }
+
+    .btn-gradient-secondary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+      color: #ffffff;
+      border: none;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.65rem 1.35rem;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+    }
+
+    .btn-gradient-secondary:hover {
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+      .app-sidebar {
+        transform: translateX(-100%);
+      }
+      .app-sidebar.show {
+        transform: translateX(0);
+      }
+      .app-main {
+        margin-left: 0;
+      }
+    }
+  </style>
+  
+  {% block extrahead %}{% endblock %}
+</head>
+<body>
+
+<div class="app-wrapper">
+  <!-- Sidebar -->
+  {% include 'base/sidebar.html' %}
+
+  <!-- Main Container -->
+  <div class="app-main">
+    <!-- Navbar -->
+    {% include 'base/navbar.html' %}
+
+    <!-- Flash Messages Container -->
+    {% if messages %}
+    <div class="container-fluid px-4 pt-3">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show d-flex align-items-center shadow-sm" role="alert">
+        <i class="fa-solid fa-circle-info me-2 fs-5"></i>
+        <div>{{ message }}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Page Content -->
+    <main class="app-content">
+      {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'base/footer.html' %}
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function toggleSidebar() {
+    document.querySelector('.app-sidebar').classList.toggle('show');
+  }
+</script>
+
+{% block extrascript %}{% endblock %}
+</body>
+</html>

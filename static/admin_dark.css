@@ -1,0 +1,66 @@
+/* Admin Dark Mode */
+body.dark-mode {
+    background-color: #333;
+    color: #ccc;
+}
+
+body.dark-mode a {
+    color: #00bfff;
+}
+
+body.dark-mode .module h2,
+body.dark-mode .module h3,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6 {
+    color: #ccc;
+}
+
+body.dark-mode .form-row input[type="text"],
+body.dark-mode .form-row input[type="password"],
+body.dark-mode .form-row textarea {
+    background-color: #444;
+    color: #ccc;
+    border-color: #555;
+}
+
+body.dark-mode .form-row input[type="text"]:focus,
+body.dark-mode .form-row input[type="password"]:focus,
+body.dark-mode .form-row textarea:focus {
+    background-color: #555;
+    border-color: #00bfff;
+}
+
+body.dark-mode .module table th {
+    background-color: #555;
+    color: #ccc;
+}
+
+body.dark-mode .module table td {
+    background-color: #444;
+    color: #ccc;
+}
+
+body.dark-mode .module table thead th {
+    background-color: #666;
+    color: #ccc;
+}
+
+body.dark-mode .module table tr:hover td {
+    background-color: #555;
+    color: #ccc;
+}
+
+body.dark-mode .module .actions {
+    background-color: #333;
+    color: #ccc;
+    border-color: #555;
+}
+
+body.dark-mode .module .actions .action-selected {
+    background-color: #555;
+    color: #ccc;
+}

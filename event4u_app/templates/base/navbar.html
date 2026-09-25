@@ -1,0 +1,82 @@
+<header class="app-topbar">
+  <div class="d-flex align-items-center gap-3">
+    <!-- Mobile Toggle -->
+    <button class="btn btn-light d-lg-none shadow-sm rounded-3" onclick="toggleSidebar()" type="button">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    
+    <!-- Title Breadcrumb -->
+    <div>
+      <h5 class="m-0 fw-bold brand-font text-dark">{{ role_title|default:"Control Center" }}</h5>
+      <small class="text-muted d-none d-md-inline" style="font-size: 0.8rem;">
+        Yashwantrao Chavan College Of Arts , Commerce & Science • Smart Event Ecosystem
+      </small>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-3">
+    <!-- Quick Search -->
+    <form class="d-none d-md-flex position-relative" action="{% url 'events' %}" method="GET">
+      <input type="text" name="q" class="form-control rounded-pill pe-5 py-2" placeholder="Search events..." style="width: 220px; font-size: 0.85rem; background: #f1f5f9; border: 1px solid #e2e8f0;">
+      <button type="submit" class="btn position-absolute end-0 top-0 text-muted" style="border: none; background: transparent; padding: 0.45rem 0.85rem;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </form>
+
+    <!-- Notification Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-light rounded-circle shadow-sm position-relative" type="button" data-bs-toggle="dropdown" style="width: 42px; height: 42px;">
+        <i class="fa-regular fa-bell text-secondary"></i>
+        {% if unread_notifications_count %}
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.65rem;">
+          {{ unread_notifications_count }}
+        </span>
+        {% endif %}
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2" style="width: 320px;">
+        <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+          <h6 class="m-0 fw-bold">Campus Announcements</h6>
+          <a href="{% url 'notification' %}" class="text-primary text-decoration-none" style="font-size: 0.75rem;">View All</a>
+        </div>
+        <div style="max-height: 280px; overflow-y: auto;">
+          {% for note in recent_notifications %}
+          <div class="p-2 border-bottom border-light">
+            <div class="fw-bold text-dark" style="font-size: 0.825rem;">{{ note.title }}</div>
+            <p class="m-0 text-muted text-truncate" style="font-size: 0.75rem;">{{ note.description|striptags }}</p>
+            <small class="text-muted" style="font-size: 0.65rem;">{{ note.createdAt|date:"M d, H:i" }}</small>
+          </div>
+          {% empty %}
+          <div class="p-3 text-center text-muted" style="font-size: 0.8rem;">No new notifications</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action / Link to Home -->
+    <a href="{% url 'home' %}" target="_blank" class="btn btn-outline-primary rounded-pill btn-sm px-3 d-none d-sm-inline-flex align-items-center gap-1">
+      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      <span>Public Portal</span>
+    </a>
+
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <button class="btn btn-light rounded-pill p-1 pe-3 d-flex align-items-center gap-2 shadow-sm border" type="button" data-bs-toggle="dropdown">
+        <div style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.85rem;">
+          {{ user.username|make_list|first|upper }}
+        </div>
+        <span class="d-none d-md-inline fw-semibold text-dark" style="font-size: 0.85rem;">{{ user.username }}</span>
+        <i class="fa-solid fa-chevron-down text-muted" style="font-size: 0.7rem;"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2">
+        <li class="px-3 py-2 border-bottom">
+          <div class="fw-bold text-dark">{% if user_profile %}{{ user_profile.display_name }}{% else %}{{ user.username }}{% endif %}</div>
+          <small class="text-muted">{{ user.email|default:"No email set" }}</small>
+        </li>
+        <li><a class="dropdown-item rounded-3 py-2 mt-1" href="{% url 'profile' %}"><i class="fa-solid fa-user me-2 text-primary"></i>My Profile</a></li>
+        <li><a class="dropdown-item rounded-3 py-2" href="{% url 'payment' %}"><i class="fa-solid fa-ticket me-2 text-info"></i>My Passes</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item rounded-3 py-2 text-danger" href="{% url 'logout' %}"><i class="fa-solid fa-arrow-right-from-bracket me-2 text-danger"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>

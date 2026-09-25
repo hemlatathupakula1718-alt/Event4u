@@ -1,0 +1,299 @@
+{% extends 'base/base.html' %}
+{% block title %}Principal Executive Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Welcome Banner -->
+  <div class="card-modern p-4 mb-4 border-0 text-white" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); position: relative; overflow: hidden;">
+    <div class="position-absolute end-0 top-0 opacity-10 p-4 d-none d-md-block">
+      <i class="fa-solid fa-graduation-cap" style="font-size: 14rem;"></i>
+    </div>
+    <div class="row align-items-center position-relative">
+      <div class="col-lg-8">
+        <span class="badge bg-warning text-dark fw-bold px-3 py-1 rounded-pill mb-2">
+          <i class="fa-solid fa-crown me-1"></i> Institutional Executive Authority
+        </span>
+        <h2 class="display-6 fw-bold mb-1 text-white">Principal & Director Portal</h2>
+        <p class="text-light opacity-75 mb-3" style="max-width: 600px;">
+          Comprehensive oversight over college events, 3-tier proposal approvals, budget sanctioning, and inter-college participation analytics.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{% url 'proposals' %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm">
+            <i class="fa-solid fa-signature me-1"></i> Review Pending Proposals ({{ pending_proposals.count }})
+          </a>
+          <a href="{% url 'report' %}" class="btn btn-outline-light rounded-pill px-4">
+            <i class="fa-solid fa-file-pdf me-1"></i> Generate College Audit PDF
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+        <div class="bg-white bg-opacity-10 backdrop-blur p-3 rounded-4 border border-white border-opacity-10 d-inline-block text-start">
+          <div class="small text-light opacity-75">Sanctioned Budget Pool</div>
+          <div class="fs-2 fw-bold text-warning">₹{{ total_budget_allocated|default:"0" }}</div>
+          <div class="small text-success"><i class="fa-solid fa-shield-check me-1"></i> 100% Institutional Compliance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6366f1, #4f46e5);">
+          <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div>
+          <div class="stat-label">Active Events</div>
+          <div class="stat-number text-dark">{{ active_events_count }}</div>
+          <small class="text-success fw-semibold"><i class="fa-solid fa-arrow-trend-up me-1"></i> Live on campus</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+          <i class="fa-solid fa-file-contract"></i>
+        </div>
+        <div>
+          <div class="stat-label">Awaiting Approval</div>
+          <div class="stat-number text-warning">{{ pending_proposals.count }}</div>
+          <small class="text-muted fw-semibold">HoD Endorsed</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+          <i class="fa-solid fa-users-rays"></i>
+        </div>
+        <div>
+          <div class="stat-label">Total Digital Passes</div>
+          <div class="stat-number text-dark">{{ total_attendees }}</div>
+          <small class="text-info fw-semibold"><i class="fa-solid fa-qrcode me-1"></i> Verifiable QR Passes</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-indian-rupee-sign"></i>
+        </div>
+        <div>
+          <div class="stat-label">Verified Revenue</div>
+          <div class="stat-number text-success">₹{{ total_verified_payments }}</div>
+          <small class="text-muted fw-semibold">Student registrations</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Section: Proposals & Analytics -->
+  <div class="row g-4 mb-4">
+    <!-- Pending Proposals Requiring Principal Sanction -->
+    <div class="col-xl-8">
+      <div class="card-modern h-100">
+        <div class="card-modern-header">
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-warning bg-opacity-10 text-warning p-2 rounded-3">
+              <i class="fa-solid fa-signature fs-5"></i>
+            </span>
+            <div>
+              <h5 class="m-0 fw-bold">Executive Proposal Approval Desk</h5>
+              <small class="text-muted">Proposals recommended by HoD awaiting your formal executive sanction</small>
+            </div>
+          </div>
+          <a href="{% url 'proposals' %}" class="btn btn-outline-primary btn-sm rounded-pill">View All Proposals</a>
+        </div>
+        <div class="card-modern-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+                <tr>
+                  <th class="ps-4">Event Proposal</th>
+                  <th>Coordinator</th>
+                  <th>College Fund Req.</th>
+                  <th>Student Fee</th>
+                  <th>HoD Endorsement</th>
+                  <th class="text-end pe-4">Executive Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for prop in pending_proposals %}
+                <tr>
+                  <td class="ps-4">
+                    <div class="fw-bold text-dark">{{ prop.title }}</div>
+                    <small class="text-muted text-truncate d-inline-block" style="max-width: 200px;">{{ prop.description|striptags }}</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">{{ prop.coordinator.name }}</div>
+                    <small class="text-muted">{{ prop.coordinator.branch }} Dept</small>
+                  </td>
+                  <td class="fw-bold text-dark">₹{{ prop.fundRecieveFromCollege }}</td>
+                  <td>₹{{ prop.feeApplicableForPerStudent }}/student</td>
+                  <td>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-2 py-1">
+                      <i class="fa-solid fa-check me-1"></i> Endorsed
+                    </span>
+                  </td>
+                  <td class="text-end pe-4">
+                    <div class="d-flex justify-content-end gap-1">
+                      <a href="{% url 'approve-proposal-principal' prop.id %}" class="btn btn-success btn-sm rounded-pill px-3 shadow-sm" title="Approve and activate event">
+                        <i class="fa-solid fa-check me-1"></i> Sanction & Activate
+                      </a>
+                      <a href="{% url 'reject-proposal' prop.id %}" class="btn btn-outline-danger btn-sm rounded-pill" onclick="return confirm('Are you sure you want to reject this proposal?');">
+                        <i class="fa-solid fa-xmark"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="6" class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-circle-check text-success fs-1 mb-2 d-block"></i>
+                    <div>All pending proposals have been reviewed and sanctioned!</div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart: Budget vs Utilization -->
+    <div class="col-xl-4">
+      <div class="card-modern h-100">
+        <div class="card-modern-header">
+          <h5 class="m-0 fw-bold">Financial Health & Audit</h5>
+        </div>
+        <div class="card-modern-body">
+          <div style="height: 240px; position: relative;">
+            <canvas id="budgetChart"></canvas>
+          </div>
+          <div class="mt-4 pt-3 border-top">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted"><i class="fa-solid fa-circle text-primary me-2" style="font-size: 0.7rem;"></i>Sanctioned Budget</span>
+              <span class="fw-bold">₹{{ total_budget_allocated }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted"><i class="fa-solid fa-circle text-success me-2" style="font-size: 0.7rem;"></i>Registrations Collected</span>
+              <span class="fw-bold text-success">₹{{ total_verified_payments }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Events & Coordinators Table -->
+  <div class="card-modern">
+    <div class="card-modern-header">
+      <div>
+        <h5 class="m-0 fw-bold">Active Sanctioned Events Directory</h5>
+        <small class="text-muted">Institutional roster of all ongoing and scheduled college events</small>
+      </div>
+      <a href="{% url 'events' %}" class="btn btn-outline-primary btn-sm rounded-pill">Open Event Catalog</a>
+    </div>
+    <div class="card-modern-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light text-muted" style="font-size: 0.8rem; text-transform: uppercase;">
+            <tr>
+              <th class="ps-4">Event Details</th>
+              <th>Category</th>
+              <th>Faculty Coordinator</th>
+              <th>Allocated Budget</th>
+              <th>Sub-Events</th>
+              <th>Attendees / Passes</th>
+              <th>Status</th>
+              <th class="text-end pe-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ev in events %}
+            <tr>
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-3">
+                  {% if ev.image %}
+                  <img src="{{ ev.image.url }}" class="rounded-3 shadow-sm object-fit-cover" width="48" height="48" alt="{{ ev.name }}">
+                  {% else %}
+                  <div class="rounded-3 bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px;">
+                    <i class="fa-solid fa-calendar-star"></i>
+                  </div>
+                  {% endif %}
+                  <div>
+                    <a href="{% url 'event_data' ev.id %}" class="fw-bold text-dark text-decoration-none hover-primary">{{ ev.name }}</a>
+                    <div class="text-muted small"><i class="fa-regular fa-clock me-1"></i>{{ ev.eventDate|date:"M d, Y"|default:"TBD" }} • {{ ev.venue }}</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="badge bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-pill">{{ ev.category }}</span></td>
+              <td>
+                <div class="fw-semibold text-dark">{{ ev.coordinator.name }}</div>
+                <small class="text-muted">{{ ev.coordinator.branch }}</small>
+              </td>
+              <td class="fw-bold">₹{{ ev.totalMoney|default:"0" }}</td>
+              <td><span class="badge bg-secondary rounded-pill">{{ ev.subevents.count }}</span></td>
+              <td class="fw-bold text-primary">{{ ev.total_attendees_count }}</td>
+              <td>
+                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 rounded-pill">
+                  {{ ev.status }}
+                </span>
+              </td>
+              <td class="text-end pe-4">
+                <a href="{% url 'generatereport' ev.id %}" class="btn btn-outline-danger btn-sm rounded-pill" title="Download ReportLab Audit PDF">
+                  <i class="fa-solid fa-file-pdf me-1"></i> PDF Report
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">No events currently active.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extrascript %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('budgetChart');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Sanctioned Pool', 'Revenue Collected'],
+          datasets: [{
+            data: [{{ total_budget_allocated|default:10000 }}, {{ total_verified_payments|default:3500 }}],
+            backgroundColor: ['#4f46e5', '#10b981'],
+            borderWidth: 0,
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            }
+          },
+          cutout: '70%'
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

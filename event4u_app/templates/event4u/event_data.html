@@ -1,0 +1,187 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ event.name }} • Event Details{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Event Hero Banner -->
+  <div class="card-modern border-0 overflow-hidden mb-4 shadow-sm position-relative text-white" style="background: linear-gradient(135deg, #111827 0%, #1e1b4b 50%, #312e81 100%);">
+    <div class="row g-0 align-items-center">
+      <div class="col-lg-5 position-relative">
+        {% if event.image %}
+        <img src="{{ event.image.url }}" class="w-100 object-fit-cover" style="height: 320px;" alt="{{ event.name }}">
+        {% else %}
+        <div class="w-100 bg-dark d-flex align-items-center justify-content-center text-primary" style="height: 320px;">
+          <i class="fa-solid fa-calendar-star" style="font-size: 6rem;"></i>
+        </div>
+        {% endif %}
+      </div>
+      <div class="col-lg-7 p-4 p-lg-5">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span class="badge bg-primary rounded-pill px-3 py-1 text-uppercase">{{ event.category }}</span>
+          <span class="badge bg-success bg-opacity-75 rounded-pill px-3 py-1"><i class="fa-solid fa-circle-check me-1"></i> {{ event.status }}</span>
+        </div>
+        <h2 class="display-5 fw-bold text-white mb-2 brand-font">{{ event.name }}</h2>
+        <div class="text-light opacity-75 mb-4" style="line-height: 1.6;">
+          {{ event.description|safe }}
+        </div>
+
+        <div class="row g-3 text-light small mb-4">
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-regular fa-clock fs-5 text-info"></i>
+              <div>
+                <div class="fw-bold">Scheduled Date & Time</div>
+                <div class="opacity-75">{{ event.eventDate|date:"l, F d, Y • g:i A"|default:"To be announced" }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-solid fa-location-dot fs-5 text-danger"></i>
+              <div>
+                <div class="fw-bold">Campus Venue</div>
+                <div class="opacity-75">{{ event.venue }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registration Action Buttons -->
+        <div class="d-flex flex-wrap gap-2">
+          {% if user_pass %}
+          <a href="{% url 'generate-pass' event.id %}" class="btn btn-warning fw-bold rounded-pill px-4 shadow">
+            <i class="fa-solid fa-ticket me-1"></i> View My Digital Pass & QR
+          </a>
+          {% else %}
+          <a href="{% url 'participant' %}" class="btn btn-gradient rounded-pill px-4 shadow">
+            <i class="fa-solid fa-trophy me-1"></i> Register as Participant
+          </a>
+          <a href="{% url 'volunteer' %}" class="btn btn-gradient-secondary rounded-pill px-3">
+            <i class="fa-solid fa-handshake-angle me-1"></i> Apply as Volunteer
+          </a>
+          <a href="{% url 'audience' %}" class="btn btn-outline-light rounded-pill px-3">
+            <i class="fa-solid fa-users me-1"></i> Book Audience Seat
+          </a>
+          {% endif %}
+          
+          {% if is_coordinator or is_principal %}
+          <a href="{% url 'generatereport' event.id %}" class="btn btn-outline-danger rounded-pill px-3">
+            <i class="fa-solid fa-file-pdf me-1"></i> Event Report PDF
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-4">
+    <!-- Sub-Events List -->
+    <div class="col-lg-8">
+      <div class="card-modern h-100">
+        <div class="card-modern-header">
+          <div>
+            <h5 class="m-0 fw-bold">Sub-Events & Competition Tracks</h5>
+            <small class="text-muted">Explore individual activities, gaming rounds, and performances</small>
+          </div>
+          <span class="badge bg-primary rounded-pill">{{ subevents.count }} Tracks</span>
+        </div>
+        <div class="card-modern-body p-0">
+          <div class="list-group list-group-flush">
+            {% for s in subevents %}
+            <div class="list-group-item p-4">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <h5 class="fw-bold text-dark m-0">{{ s.name }}</h5>
+                  <small class="text-muted"><i class="fa-solid fa-location-dot me-1"></i>{{ s.venue }}</small>
+                </div>
+                <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 rounded-pill px-3 py-1">
+                  Budget: ₹{{ s.totalBudget|default:0 }}
+                </span>
+              </div>
+
+              <div class="text-muted small mb-3">
+                {{ s.description|safe }}
+              </div>
+
+              <div class="d-flex flex-wrap justify-content-between align-items-center bg-light p-3 rounded-3 small">
+                <div>
+                  <span class="text-muted">Student Lead:</span>
+                  <strong class="text-dark ms-1">{{ s.subcoordinator.name }}</strong> (ERP: {{ s.subcoordinator.erp }})
+                </div>
+                <div>
+                  <span class="text-muted">Schedule:</span>
+                  <strong class="text-dark ms-1">{{ s.eventDate|date:"M d, Y, g:i A"|default:"During Fest" }}</strong>
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="p-5 text-center text-muted">
+              <i class="fa-solid fa-layer-group fs-2 mb-2 d-block"></i>
+              No sub-events listed for this main event yet.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar: Coordinator & Payment Meta -->
+    <div class="col-lg-4">
+      <!-- Coordinator Card -->
+      <div class="card-modern mb-4">
+        <div class="card-modern-header">
+          <h6 class="m-0 fw-bold">Faculty Coordinator In-Charge</h6>
+        </div>
+        <div class="card-modern-body text-center">
+          <div class="mb-3">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #4f46e5, #ec4899); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.75rem; font-weight: bold; margin: 0 auto;">
+              {{ event.coordinator.name|make_list|first|upper }}
+            </div>
+          </div>
+          <h5 class="fw-bold text-dark mb-1">{{ event.coordinator.name }}</h5>
+          <p class="text-muted small mb-3">{{ event.coordinator.branch }} Engineering Department</p>
+          <div class="bg-light p-2 rounded-3 text-start small text-muted">
+            <div class="d-flex justify-content-between mb-1">
+              <span>Semester:</span>
+              <strong class="text-dark">{{ event.coordinator.semester }}</strong>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>ERP Number:</span>
+              <strong class="text-dark">{{ event.coordinator.erp }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment & UPI Card -->
+      <div class="card-modern">
+        <div class="card-modern-header bg-success bg-opacity-10">
+          <h6 class="m-0 fw-bold text-success"><i class="fa-solid fa-qrcode me-1"></i> Fee & Payment Information</h6>
+        </div>
+        <div class="card-modern-body">
+          <p class="small text-muted mb-3">Pay registration fees to activate your verifiable QR entry pass.</p>
+          
+          <div class="bg-light p-3 rounded-3 mb-3 text-center border">
+            <div class="small text-muted mb-1">Official UPI Collection ID</div>
+            <div class="fs-5 fw-bold text-dark font-monospace user-select-all">{{ event.upi|default:"9321887200@pytm" }}</div>
+          </div>
+
+          <div class="d-grid gap-2">
+            {% if user_pass %}
+            <a href="{% url 'generate-pass' event.id %}" class="btn btn-warning rounded-pill py-2 fw-bold">
+              <i class="fa-solid fa-ticket me-1"></i> Open My Entry Pass
+            </a>
+            {% else %}
+            <a href="{% url 'payment' %}" class="btn btn-success rounded-pill py-2 fw-bold">
+              <i class="fa-solid fa-credit-card me-1"></i> Pay Fee & Claim Pass
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

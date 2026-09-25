@@ -1,0 +1,102 @@
+{% extends 'base/base.html' %}
+{% block title %}Photo Memories & Fest Highlights{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <div>
+      <h3 class="m-0 fw-bold brand-font text-dark">Event Memories & Photo Album</h3>
+      <small class="text-muted">Highlights, stage performances, competitions, and festival moments</small>
+    </div>
+
+    {% if is_coordinator or is_subcoordinator or is_principal %}
+    <button class="btn btn-gradient rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#uploadMemoryModal">
+      <i class="fa-solid fa-camera-retro me-1"></i> Upload Event Photo
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Event Filter Pills -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <a href="{% url 'memories' %}" class="btn btn-sm rounded-pill px-3 fw-semibold {% if not selected_event %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+      All Events
+    </a>
+    {% for ev in events %}
+    <a href="{% url 'memories' %}?event={{ ev.id }}" class="btn btn-sm rounded-pill px-3 fw-semibold {% if selected_event == ev.id|stringformat:'i' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      {{ ev.name }}
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Memories Gallery Grid -->
+  <div class="row g-4">
+    {% for mem in memories %}
+    <div class="col-sm-6 col-md-4 col-lg-3">
+      <div class="card-modern h-100 overflow-hidden border-0 shadow-sm position-relative">
+        {% if mem.image %}
+        <img src="{{ mem.image.url }}" class="w-100 object-fit-cover" style="height: 220px;" alt="{{ mem.title }}">
+        {% else %}
+        <div class="w-100 bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center text-muted" style="height: 220px;">
+          <i class="fa-solid fa-image fs-1 opacity-50"></i>
+        </div>
+        {% endif %}
+        <div class="p-3">
+          <h6 class="fw-bold text-dark mb-1">{{ mem.title }}</h6>
+          <div class="d-flex justify-content-between align-items-center small text-muted">
+            <span class="badge bg-primary bg-opacity-10 text-primary">{{ mem.event.name }}</span>
+            <small>{{ mem.createdAt|date:"M d, Y" }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+      <div class="p-5 bg-white rounded-4 border text-muted">
+        <i class="fa-solid fa-images fs-1 text-secondary opacity-50 mb-3"></i>
+        <h5>No Memories Uploaded Yet</h5>
+        <p class="text-muted small">Event photos will appear here after festival sessions.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- Upload Memory Modal -->
+<div class="modal fade" id="uploadMemoryModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content rounded-4 border-0 shadow-lg">
+      <div class="modal-header border-bottom px-4 py-3">
+        <h5 class="modal-title fw-bold">Upload Event Highlight Photo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="{% url 'memories' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body px-4 py-3">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Select Event</label>
+            {{ form.event }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Sub-Event (Optional)</label>
+            {{ form.subevent }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Caption / Memory Title</label>
+            {{ form.title }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Photo File</label>
+            {{ form.image }}
+          </div>
+        </div>
+        <div class="modal-footer border-top px-4 py-3">
+          <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-gradient rounded-pill px-4">Upload to Gallery</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
